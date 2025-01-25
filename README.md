@@ -5,7 +5,7 @@ By Audrey Fuller (alf9310@rit.edu)
 # Raytracer Assignment #1: Setting the Scene
 
 For the geometry of this scene, I used Blender's own raytracing engine to render the example shown in the slides.
-![Raytracer Blender Scene](./images/blender_raytracer_output.png?raw=true "Raytracer Blender Scene")
+![Raytracer Blender Scene](./blender_raytracer_output.png?raw=true "Raytracer Blender Scene")
 
 In terms of scene parameters, here were my object transform properties (Z is considered upwards, coordinates are in x,y,z format):
 Sphere 1:
