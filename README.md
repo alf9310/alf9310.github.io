@@ -29,10 +29,10 @@ The main driver code for the project is Raytracer.cpp, which:
 - Places and sets up a Camera
 - Then renders the scene by calling the camera's generate_rays function on the World
 
-###Example Outputs:
+### Example Outputs:
 ![Spheres](./sphere_image.png?raw=true "Spheres Image")
 
-![Rotating Camera on Spheres](./sphere_loop.png?raw=true "Rotating Camera on Spheres")
+![Rotating Camera on Spheres](./sphere_loop.gif?raw=true "Rotating Camera on Spheres")
 
 For the GIF, I used the Camera's rotate_around_lookat method, which calculates a rotation matrix for y and then updates the 
 origin of the camera. This was repeated between 0 and 360 degrees in intervals of 10 degrees, and took aproximately 2 minutes
@@ -40,7 +40,7 @@ for the 1,200 x 675px above (though only a few seconds for a 400 x 225 pixel ima
 the Image Magick CLI (Which has the most amazing website ever), which I'm planning on writing a bash script for in the future 
 as it was a bit tedius.
 
-###Extra Shapes:
+### Extra Shapes:
 ![Cylinders](./cylinder_image.png?raw=true "Cylinder Image")
 
 For the cylinder implementation, I multiplied the Object color by it's z position to show that it wasn't drawing both the base 
