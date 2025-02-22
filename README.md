@@ -1,11 +1,69 @@
 # C++ Raytracer Project Documentation for CSCI 711 - Global Illumination
 By Audrey Fuller (alf9310@rit.edu)
 
+## Raytracer Assignment #3: Basic Shading
+
+The goal of this phase was add an Illumination Model and Shadow testing to the ray tracer.
+
+![Tri Light Phong Model](./media/hq_tri_light_phong.gif?raw=true "Tri Light Phong Model") 
+
+### Supersampling
+
+![No Anti-Aliasing](./media/no_anti_aliasing.png?raw=true "No Anti-Aliasing") ![Random Anti-Aliasing](./media/random_anti_aliasing.png?raw=true "Random Anti-Aliasing")
+![Grid Anti-Aliasing](./media/grid_anti_aliasing.png?raw=true "Grid Anti-Aliasing") ![Jittered Grid Anti-Aliasing](./media/jittered_grid_anti_aliasing.png?raw=true "Jittered Grid Anti-Aliasing")
+
+Before I got to implementing an illumination model, I experimented with a few different anti-aliasing methods.
+Here they are:
+- **None**: Very jagged and uneven edges, still the most efficient as it doesn't require the spawning of any
+  additional rays.
+- **Random**: Spawing rays through random locations in the pixel, and averaging the results. This one was
+  pretty bad and resulted in a lot of wierd colors and rough edges on my shapes (as sometimes the
+  random rays would all be in a single area).
+- **Grid**: Split the pixel into a "samples" x "samples" grid, and send a ray through the center of each sub-pixel.
+  I think this produced the best results for the runtime cost.
+- **Jittered Grid**: Same as the grid method, but I added a small random "jitter" offset so it wouldn't always send
+  a ray through the center of the sub-pixel. Could be considered better as it added a bit of non-uniformity, but
+  the computational cost of generating and adding the offset wasn't worth it IMO.
+
+One algorithm that I was really interested in but didn't quite have time to implement was **Adaptive Supersampling** 
+(where you shoot rays through each of the four pixel corners, and if their luminance is different enough you 
+subdivide the pixel and try again). Unfortunately my try at an implementation had something wrong with the recursive 
+call, and ended up getting stuck in infinate loops :(.
+
+### Illumination Models
+
+![Lambertian](./media/lambertian.png?raw=true "Lambertian") ![Phong](./media/phong.png?raw=true "Phong") ![Phong-Blinn](./media/phong_blinn.png?raw=true "Phong-Blinn") 
+
+Same with the supersampling, I tried to implement a few different illumination models in an "illumination_model" 
+class. They are as follows:
+
+- **Lambertian**: Just a simple shadow-ray and diffuse light (light direction dot normal) calculation.
+- **Phong**: The best looking model I got working IMO. Added a specular highlight based on the reflection direction.
+  Is also the model I used for the GIF at the top of the section.
+- **Phong-Blinn**: Using the halfway vector for the specular light is _supposed_ to look more realistic, but the
+  lack of a curve makes it look worse than just Phong. I also read that using the halfway vector was supposed to
+  improve performance as the reflection doesn't have to be calculated, but in my implementation performance seems
+  about the same. There seems to be a strange cut-off for the diffuse component of the light source directly
+  above the sphere that I coudn't figure out as well.
+
+I also tried getting the Ashikhmin-Shirley and Cook-Torrence Models running, but ultimately ran out of time. There
+was a cool bug I discovered in my half-completed Cook-Torrence code that resulted in this stained-glass effect:
+
+![Wierd Cook-Torrance Bug](./media/wierd_cook_torrance_bug.png?raw=true "Wierd Cook_Torrance Bug")
+
+### Tone Reproduction
+
+Last minor thing I did was saving my outputted Luminance values to a buffer, to then convert to RGB and print to
+standard out. This helped me correct really dull results such as the image below. Saving the values to a buffer 
+also allowed me to do multi-threading for calculating the pixel values themselves, which sped up the program.
+
+![Twilight Filter](./media/twilight_filter.png?raw=true "Twilight Filter")
+
 ## Raytracer Assignment #2: Raytracing Framework
 
 The goal of this phase was to implement a non-recursive raytracer.
 ### The Framework:
-![Phase 2 Framework](./phase_2_framework.png?raw=true "Phase 2 Framework")
+![Phase 2 Framework](./media/phase_2_framework.png?raw=true "Phase 2 Framework")
 
 The World Class holds a C++ vector of Objects, which store:
 - A Color (going to be changed to material in phase 3)
@@ -30,9 +88,9 @@ The main driver code for the project is Raytracer.cpp, which:
 - Then renders the scene by calling the camera's generate_rays function on the World
 
 ### Example Outputs:
-![Spheres](./sphere_image.png?raw=true "Spheres Image")
+![Spheres](./media/sphere_image.png?raw=true "Spheres Image")
 
-![Rotating Camera on Spheres](./sphere_loop.gif?raw=true "Rotating Camera on Spheres")
+![Rotating Camera on Spheres](./media/sphere_loop.gif?raw=true "Rotating Camera on Spheres")
 
 For the GIF, I used the Camera's rotate_around_lookat method, which calculates a rotation matrix for y and then updates the 
 origin of the camera. This was repeated between 0 and 360 degrees in intervals of 10 degrees, and took aproximately 2 minutes
@@ -41,7 +99,7 @@ the Image Magick CLI (Which has the most amazing website ever), which I'm planni
 as it was a bit tedius.
 
 ### Extra Shapes:
-![Cylinders](./cylinder_image.png?raw=true "Cylinder Image")
+![Cylinders](./media/cylinder_image.png?raw=true "Cylinder Image")
 
 For the cylinder implementation, I multiplied the Object color by it's z position to show that it wasn't drawing both the base 
 and top (which is why the colors look a bit wierd). I based my ray intersect code for it on Inigo Quilez's shadertoy example, 
@@ -52,7 +110,7 @@ warped when close to the boarders of the image, which I'm still trying to figure
 ## Raytracer Assignment #1: Setting the Scene
 
 For the geometry of this scene, I used Blender's own raytracing engine to render the example shown in the slides.
-![Raytracer Blender Scene](./blender_raytracer_output.png?raw=true "Raytracer Blender Scene")
+![Raytracer Blender Scene](./media/blender_raytracer_output.png?raw=true "Raytracer Blender Scene")
 
 In terms of scene parameters, here were my object transform properties (Z is considered upwards, coordinates are in x,y,z format):
 
