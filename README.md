@@ -1,6 +1,42 @@
 # C++ Raytracer Project Documentation for CSCI 711 - Global Illumination
 By Audrey Fuller (alf9310@rit.edu)
 
+## Raytracer Assignment #4: Procedural Shading
+
+The goal of this phase was add the ability to support procedural textures to the raytracer
+
+![Checkerboard](./media/checkerboard.gif?raw=true "Checkerboard") 
+
+### Texture Class
+
+The largest change to my project structure in this phase was the implementation of the Texture class. 
+Instead of an object's Material just storing the base color and illumination parameters, it stores a 
+pointer to a texture instead! While every texture child stores UV coordinates, they each use them 
+differently when calculating a base color for an intersection in the illumination model. Here are the 
+two I have implemented so far:
+- **Solid Color**: Just a solid color for the entire object instance (does not rely on UV)
+- **Checkerboard**: A proceduraly generated checkerboard pattern calculated by if U + V is even or odd.
+  Also takes in width parameters for the tiles.
+
+The UV coordinate values are calculated in the "intersect" function for each shape, and stored in the 
+Intersect class.
+
+![Checkerboard](./media/checkerboard.png?raw=true "Checkerboard") 
+
+### Future Additions
+
+Hopefully this section won't be around for very long, as I plan on adding the extentions to this phase 
+of the raytracer as soon as break is done and I have access again to my pc!
+Things I want to implement:
+- **Mandelbrot Fractal Texture**: It looks really interesting and I'd like to try and create it in my raytracer
+- **Perlin Noise Texture**: I know Simplex Noise is technically better, but I'm more farmiliar with good ol' perlin
+- **Image Texture Mapping**: Will probably require the most work, but seems extremily powerful
+- **Skybox**: Adding functionality to map a texture to the background of the scene
+- **Bump Mapping**: Implementation-wise I understand this the least, BUT the results look really cool
+- **Texture Anti-Aliasing**: I don't think I'll be trying to implement anything too fancy like FFT, but even bluring
+  surrounding texture values seems to make a positive diference.
+
+
 ## Raytracer Assignment #3: Basic Shading
 
 The goal of this phase was add an Illumination Model and Shadow testing to the ray tracer.
