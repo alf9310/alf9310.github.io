@@ -3,38 +3,49 @@ By Audrey Fuller (alf9310@rit.edu)
 
 ## Raytracer Assignment #4: Procedural Shading
 
-The goal of this phase was add the ability to support procedural textures to the raytracer
+The goal of this phase was add the ability to support procedural textures to the raytracer, as well as images :)
 
-![Checkerboard](./media/checkerboard.gif?raw=true "Checkerboard") 
+![Joe Sphere](./media/joe_geigel_sphere?raw=true "Joe Sphere") 
 
 ### Texture Class
 
 The largest change to my project structure in this phase was the implementation of the Texture class. 
 Instead of an object's Material just storing the base color and illumination parameters, it stores a 
-pointer to a texture instead! While every texture child stores UV coordinates, they each use them 
+pointer to a texture instead. While every texture child stores UV coordinates, they each use them 
 differently when calculating a base color for an intersection in the illumination model. Here are the 
-two I have implemented so far:
+ones I have implemented:
 - **Solid Color**: Just a solid color for the entire object instance (does not rely on UV)
 - **Checkerboard**: A proceduraly generated checkerboard pattern calculated by if U + V is even or odd.
   Also takes in width parameters for the tiles.
+  ![Checkerboard](./media/checkerboard.gif?raw=true "Checkerboard") 
+- **Mandelbrot Fractal Texture**: I had to do a bit of research to figure out what this even was before
+  trying to implemnet it. In the end, I decided to make my editable parameters for the Mandelbrot set
+  equation loop to be the # of itterations to traverse through the set, and two colors (one for when the
+  point is in the set, and one for when it isn't.
+  ![Mandelbrot](./media/mandelbrot.png?raw=true "Mandelbrot")
+- **Perlin Noise Texture**: For this I created a seperate "noise" class that could be used for a variety of
+  generation methods (like simplex possibly in the future). I started by doing some reaserch to refresh myself
+  on the algorithm, then implementing noise generation in 1D before moving onto 2D & 3D noise (the implementation
+  below is with 2D noise mapped to uv).
+  ![Noise](./media/noise.png?raw=true "Noise")
+- **Image Texture Mapping**: As you might have seen at the top of this section, I finished implementing image
+  texture mapping! For this it seemed like the simplist and most lightweight way to read in textures
+  would be to include the stb_image & stb_image_read libraries, and then pre-load them into an array of colors
+  when defining the material object. Once I debugged my texture display code, I decided to create some more complex
+  scenes for fun, like this solar system one:
+  ![Solar System](./media/solar_system.gif?raw=true "Solar System")
+- **Skybox Cubemap**: While not directly a texture type, the creation of the Solar System Scene above lead to me
+  wanting to make the background more interesting by adding stars. So I decided to add a couple absitraction layers
+  to my triangle object class, including a plane class comprised of two triangles, then a skybox comprised of six
+  planes (so I woudln't have to re-define all 12 triangles every time I want to create a skybox). Currently this
+  is about 80% functional, as there seemes to be an issue with each face of my skybox textures lining up, and for
+  some reason including a skybox breaks my lighting...
+  ![Skybox](./media/skybox.png?raw=true "Skybox")
 
-The UV coordinate values are calculated in the "intersect" function for each shape, and stored in the 
-Intersect class.
-
-![Checkerboard](./media/checkerboard.png?raw=true "Checkerboard") 
 
 ### Future Additions
 
-Hopefully this section won't be around for very long, as I plan on adding the extentions to this phase 
-of the raytracer as soon as break is done and I have access again to my pc!
-Things I want to implement:
-- **Mandelbrot Fractal Texture**: It looks really interesting and I'd like to try and create it in my raytracer
-- **Perlin Noise Texture**: I know Simplex Noise is technically better, but I'm more farmiliar with good ol' perlin
-- **Image Texture Mapping**: Will probably require the most work, but seems extremily powerful
-- **Skybox**: Adding functionality to map a texture to the background of the scene
-- **Bump Mapping**: Implementation-wise I understand this the least, BUT the results look really cool
-- **Texture Anti-Aliasing**: I don't think I'll be trying to implement anything too fancy like FFT, but even bluring
-  surrounding texture values seems to make a positive diference.
+I still hope to potentially implement bump mapping, as well as simplex noise generation.
 
 
 ## Raytracer Assignment #3: Basic Shading
