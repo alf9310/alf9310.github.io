@@ -5,7 +5,7 @@ By Audrey Fuller (alf9310@rit.edu)
 
 The goal of this phase was add the ability to support procedural textures to the raytracer, as well as images :)
 
-![Joe Sphere](./media/joe_geigel_sphere?raw=true "Joe Sphere") 
+![Joe Sphere](./media/joe_geigel_sphere.png?raw=true "Joe Sphere") 
 
 ### Texture Class
 
