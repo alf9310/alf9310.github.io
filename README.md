@@ -1,6 +1,24 @@
 # C++ Raytracer Project Documentation for CSCI 711 - Global Illumination
 By Audrey Fuller (alf9310@rit.edu)
 
+## Raytracer Assignment #5: Reflection
+
+The goal of this phase was to add support for reflective materials, by recursively spawning in reflective rays.
+
+![Reflective Random](./media/reflective_random.png?raw=true "Reflective Random") 
+
+### Changes to Material & Illumination Model Classes
+
+The main changes implemented were adding reflection & transmission coefficient variabled to the Materials class 
+to determine how much of the reflected ray to apply to the object's color output. Then in the illumination model 
+class, I did a bit of refactoring to get rid of some of the nested if-statements & loops for readability, and 
+recursively shot out rays in the reflected direction until the maximum depth was reached (being 5 for the below 
+image). While this does support multiple reflective rays, it doesn't yet Implement Kajia’s method for stochastic
+sampling yet.
+
+![Whitted Reflective](./media/whitted_reflective.gif?raw=true "Whitted Reflective") 
+
+
 ## Raytracer Assignment #4: Procedural Shading
 
 The goal of this phase was add the ability to support procedural textures to the raytracer, as well as images :)
