@@ -1,6 +1,62 @@
 # C++ Raytracer Project Documentation for CSCI 711 - Global Illumination
 By Audrey Fuller (alf9310@rit.edu)
 
+## Raytracer Assignment #6: Transmission & Refraction
+
+The goal of this phase was to add support for transparent materials by spawning transmissive rays when hit. 
+
+![Refraction](./media/refraction.png?raw=true "Refraction") 
+
+(One transparent sphere where kt = 0.8 & IOR = 1.03, and one opaque & reflective where kt = 0.0)
+
+### Changes to Material & Illumination Model Classes
+
+Same as the last phase, I added aditional parameters to my Material class. This includes the transmission 
+coefficient, which determines the transparency of the material and it's shadow. I also added an additional 
+refraction index perameter, which controls the angle of the refraction ray when passing through mediums 
+(example IORs 1: air, 1.5: glass, 2.4: diamond). 
+
+The changes to the illumination model are also similar to what was done for reflection, as when a ray hits a 
+non-opaque object, it spawns a refraction ray, using Snell's Law to calculate the angle. The first step of this 
+was determining if we're entering or exiting the medium using the dot product of the incoming ray and the normal. 
+If this is <0, that means we're exiting the material, so the IOR is inverted and the normal is flipped. The other 
+special case of total internal reflection is handled by checking if the angle of a ray moving from a high refractive index a lower one is steep. If the sin^2(theta_t) value is suitably large ( >= 1), the light is reflected on the edge 
+of the sphere instead. 
+
+Getting transparent shadows to work was a bit trickier, as it involved changing how I spawn in shadow rays. While I 
+initially had the idea of multiplying the shadow ray by the transmission property of the material it intersected 
+with, this didn't acount for the cases where there may be multiple transparent objects between the shadow and the 
+light source. So instead, I spawned shadow rays in a loop, increasing the attenuation of the light by the 
+transmission variable of each object it passes through (For example, if it passes through two objects with 50% transparency on the way to the light source, the shadow will be completely solid. While this isn't 100% accurate to 
+how real transpatency work (as I should be scaling the shadow by the depth of the material), it seems like a close 
+enough approximation. 
+
+### Completed Whitted Scene
+
+Now that all of the components of the original 1980's Whitted Raytracer are completed, here is the closest 
+approximation I managed to rended to the origional scene using my engine. 
+
+![Whitted Refraction](./media/whitted_refraction.png?raw=true "Whitted Refraction") 
+
+Original Whitted Scene:
+![Original Whitted](./media/original_whitted.png?raw=true "Original Whitted") 
+
+Reference Provided in Class:
+![Class Whitted](./media/class_whitted.png?raw=true "Class Refraction") 
+
+Even with the core of my rendering engine complete, there still seems to be a couple element's I'm not able to 
+replicate yet. Here they are:
+• An extra layer of refraction/rim lighting on the outside of the mostly transparent sphere. This could possibly 
+be due to the inclusion of a smaller "air sphere" inside of it, leading to additional refraction rays being spawned. 
+• A 'fuzzy' effect for the reflection around the edges of the sphere.  
+• The lack of a getting rid of the 'double highlight' on the scene's refractive sphere. 
+
+Depending on how much time I have remaining, I'd like to fix up these issues to get the result looking as close as 
+I can!
+
+![Whitted Refraction GIF](./media/whitted_refraction.gif?raw=true "Whitted Refraction GIF") 
+
+
 ## Raytracer Assignment #5: Reflection
 
 The goal of this phase was to add support for reflective materials, by recursively spawning in reflective rays.
