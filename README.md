@@ -95,28 +95,7 @@ Heres the (final) algorithm used:
 While the KD-tree worked fantastic for complex scenes (thousands of objects), due to the Whitted Scene only having four objects, ultimately the creation lead to 
 more overhead than traversal time saved. Here's some tables showing both KD-tree building and render time performance for various depths and scene complexities.
 
-1980 Whitted (Spheres on a Plane)
-| KD-Tree Depth                                      | Build Time | Render Time |
-| -------------------------------------------------- | ---------- | ----------- |
-| 0                                                  | 0.0178401  | 10.8479     |
-| 5                                                  | 0.0195223  | 14.7807     |
-| 10                                                 | 0.0205261  | 18.9532     |
-
-Stanford Bunny (7000 Polygons)
-| KD-Tree Depth                                      | Build Time | Render Time |
-| -------------------------------------------------- | ---------- | ----------- |
-| 0                                                  | 0.0425014  | 6177.75     |
-| 5                                                  | 14.8146    | 375.442     |
-| 10                                                 | 16.568     | 79.1215     |
-| 15                                                 | 17.7112    | 76.0094     |
-
-Random Reflective Objects (25 Spheres/Cylinders)
-| KD-Tree Depth                                      | Build Time | Render Time |
-| -------------------------------------------------- | ---------- | ----------- |
-| 0                                                  | 0.0196276  | 151.272     |
-| 5                                                  | 0.0351621  | 100.536     |
-| 10                                                 | 0.043425   | 127.273     |
-
+![KD-tree Times](./media/kd-tree_times.png?raw=true "KD-Tree Times") 
 
 ## Raytracer Assignment #6: Transmission & Refraction
 
