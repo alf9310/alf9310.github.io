@@ -1,7 +1,7 @@
 # C++ Raytracer Project Documentation for CSCI 711 - Global Illumination
 By Audrey Fuller (alf9310@rit.edu)
 
-## Raytracer Assignment Advanced Assignment: KD-Tree Spacial Data Structure
+## Raytracer Advanced Assignment: KD-Tree Spacial Data Structure
 
 ![Bisexual Man](./media/bisexual_man.png?raw=true "Bisexual Man") 
 
@@ -96,6 +96,26 @@ While the KD-tree worked fantastic for complex scenes (thousands of objects), du
 more overhead than traversal time saved. Here's some tables showing both KD-tree building and render time performance for various depths and scene complexities.
 
 ![KD-tree Times](./media/kd-tree_times.png?raw=true "KD-Tree Times") 
+
+## Raytracer Assignment #7: Tone Reproduction
+
+The goal of this phase was to apply a decent tone reproduction operator to compress simulated radiances to display radiances. For this I used two methods, 
+Ward’s tone reproduction operator (Perceptual) and Reinhard’s tone reproduction operator (Photographic). Here are the results:
+
+Light Intensity Values: 1, 2, 4
+
+### Ward Tone Reproduction 
+Simple heuristic based on perceptual tests.
+
+![Ward 1](./media/ward_1.png?raw=true "Ward 1") 
+![Ward 2](./media/ward_2.png?raw=true "Ward 2") 
+![Ward 4](./media/ward_4.png?raw=true "Ward 4") 
+
+### Reinhard's Tone Reproduction
+Simple heuristic based on photographic systems to model a photographic-like response.
+![Reinhard 1](./media/reinhard_1.png?raw=true "Reinhard 1") 
+![Reinhard 2](./media/reinhard_2.png?raw=true "Reinhard 2") 
+![Reinhard 4](./media/reinhard_4.png?raw=true "Reinhard 4") 
 
 ## Raytracer Assignment #6: Transmission & Refraction
 
