@@ -1,6 +1,123 @@
 # C++ Raytracer Project Documentation for CSCI 711 - Global Illumination
 By Audrey Fuller (alf9310@rit.edu)
 
+## Raytracer Assignment Advanced Assignment: KD-Tree Spacial Data Structure
+
+![Bisexual Man](./media/bisexual_man.png?raw=true "Bisexual Man") 
+
+![Glass Man](./media/glass_man.png?raw=true "Glass Man") 
+
+The goal of this phase was speed up the ray tracer by introducing the use of a spatial data structure, 
+namely a k-d tree.
+
+### Reading 3D Objects into the Scene
+
+Before adding an acceleration structure to render complex scenes quicker, I wanted my raytracer 
+to first be able to actually support complex scenes! So instead of hand writing thousands of polygon 
+coordinates myself, I used the open plycpp library (2021 Romain Brégier) to read in Stanford 3D scanned 
+models. Then with some intermediate code to convert the plycpp output to the triangle objects in my 
+raytracer, I was able to render a compressed (7,000 polygon) Stanford bunny in a whopping hour and a 
+half. 
+
+![KD Tree Bunny](./media/kd-tree_bunny.png?raw=true "KD Tree Bunny") 
+
+While normally I would have started on the KD-tree by now, I was beginning to get a bit dissadisfied 
+with the .ply file format. As the Polygon File Format is most commonly used for 3D scans of objects, 
+most of the interesting open-source 3D models made by artists online were instead most commonlt found 
+in the .obj file format instead. SO instead of going through the hassle of importing them into Blender 
+to then convert to .ply files, I ended up adding support for .obj files as well for my raytracer. For the 
+main parsing code, I really liked the 'tiny obj loader' library (2012 Syoyo Fujita) for it's fast file reading. 
+Additionally, all of the 3D models shown in this section besides the compressed KD-Tree bunny are from the 
+McGuire Computer Graphics Archive ([Link Here](https://casual-effects.com/data/index.html)).
+
+![Big KD Tree Bunny](./media/bunny_144k.png?raw=true "Big KD Tree Bunny") 
+
+### Building the KD-Tree
+
+Now for actually rendering these massive .obj files! For my KD Tree archetecture, I have three main classes:
+- **Axis-Aligned Bounding Box**(aabb): Stores two 3D coordinates for the smallest and largest corner values.
+- **KD-Node**: Makes up the contents of the KD-Tree, and stores an aabb for it's location in the scene.
+Can either be an internal node that holds pointers to front and rear KD-Node children, or a leaf node
+which stores a list of pointers to the objects that fall within the confines of the node's bouding box.
+- **KD-Tree**: The main spatial partitioning data structure used to speed up ray-triangle intersection calculations,
+similar to a binary search tree but over 3 dimentions. Stores a root KD-Node, a list of objects in the tree, and a
+list of aabbs for said objects. Also keeps track of current and maximum set depth for building.
+
+Here's the algorithm that my recursive KD-tree building uses:
+Given a list of all objects, AABB of all objects & a root
+1. If terminal, return a new KDNode (leaf) with the objects
+2. Find partition plane (Spacial Medium Method or Surface Area Heuristic)
+3. Split the the AABB into two halves (front and rear)
+4. Partition the objects into two halves
+5. Create child nodes recursively
+6. Return a new KDNode (internal) with the child nodes
+
+I initially coded my tree to use the Spacial Medium Method for finding which plane to split along (a simple 
+round-robin style choice). However, this lead to some really nonoptimal splits and deep trees that took a 
+considerable about of time to traverse. So instead I swapped to the more robust Surface Area Heuristic algorithm, 
+which chooses a split axis adaptively based on the scene geometry to minimize the area of triangle-dense nodes. This 
+means that rays are less likely to have to traverse through computationally expensive parts of the scene they may not 
+intersect with. 
+
+Here's the algorithm:
+1. For each axis (x, y, z), gather potential split positions from object AABB min/max bounds.
+2. For each position:
+3.   Partition objects into front and rear.
+4.   Calculate front/rear AABBs and their surface areas.
+5.   Evaluate cost using C = 1 + SA(front)/SA(total) * Nf + SA(rear)/SA(total) * Nr.
+6.   Track the axis and position with the lowest cost.
+
+While taking a bit longer to build the KD tree, this method lead to some fantastic speed-ups during traversal!
+
+![Reflective Bunny](./media/reflective_bunny.png?raw=true "Reflective Bunny") 
+
+### KD-Tree Traversal
+
+For traversing the KD-tree when checking for ray-polygon intersections, I use a TA-B algorithm for additional 
+speed. While the structure is similar to a TA-A algorithm, it uses coordinates rather than distances to determine 
+whether or not to traverse the far node. 
+
+Heres the (final) algorithm used:
+1. Base Case – Null Node or if the ray doesn't intersect the node's bounding box
+2. Leaf Node Check: Iterate through the node's objects to find the closest intersection, exit if hit.
+3. Internal Node – Compute: The splitting axis and position, ray's direction and origin along the split axis, and distance to the split plane.
+4. Handle Parallel Rays (Z cases): If the ray is nearly parallel to the split plane only traverse one child
+5. Determine Near vs Far Children based on ray direction
+6. Decide Traversal Case (P/N cases):
+7.   Case 2 (P2/N2): Split is behind entry → traverse far child only.
+8.   Case 3 (P3/N3): Split is beyond exit → traverse near child only.
+9.   Case 4 (P4/N4): Split is between entry and exit → Traverse near child first, if a hit is closer the split, return early. Otherwise also check far_child.
+
+![Teapot](./media/teapot.png?raw=true "Teapot") 
+
+### Runtime Speedup
+
+While the KD-tree worked fantastic for complex scenes (thousands of objects), due to the Whitted Scene only having four objects, ultimately the creation lead to 
+more overhead than traversal time saved. Here's some tables showing both KD-tree building and render time performance for various depths and scene complexities.
+
+1980 Whitted (Spheres on a Plane)
+| KD-Tree Depth                                      | Build Time | Render Time |
+| -------------------------------------------------- | ---------- | ----------- |
+| 0                                                  | 0.0178401  | 10.8479     |
+| 5                                                  | 0.0195223  | 14.7807     |
+| 10                                                 | 0.0205261  | 18.9532     |
+
+Stanford Bunny (7000 Polygons)
+| KD-Tree Depth                                      | Build Time | Render Time |
+| -------------------------------------------------- | ---------- | ----------- |
+| 0                                                  | 0.0425014  | 6177.75     |
+| 5                                                  | 14.8146    | 375.442     |
+| 10                                                 | 16.568     | 79.1215     |
+| 15                                                 | 17.7112    | 76.0094     |
+
+Random Reflective Objects (25 Spheres/Cylinders)
+| KD-Tree Depth                                      | Build Time | Render Time |
+| -------------------------------------------------- | ---------- | ----------- |
+| 0                                                  | 0.0196276  | 151.272     |
+| 5                                                  | 0.0351621  | 100.536     |
+| 10                                                 | 0.043425   | 127.273     |
+
+
 ## Raytracer Assignment #6: Transmission & Refraction
 
 The goal of this phase was to add support for transparent materials by spawning transmissive rays when hit. 
